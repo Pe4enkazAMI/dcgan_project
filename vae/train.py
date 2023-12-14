@@ -40,7 +40,6 @@ def main(cfg: DictConfig):
     model = instantiate(cfg["arch"])
     logger.info(model)
     print("MODEL SETUP COMPLETED...")
-    model.first_conv.requires_grad_(False)
 
     # prepare for (multi-device) GPU training
     device, device_ids = prepare_device(cfg["n_gpu"])
