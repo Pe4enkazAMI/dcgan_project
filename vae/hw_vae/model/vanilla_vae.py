@@ -20,8 +20,8 @@ class vVAE(nn.Module):
 
         self.encoder = VEncoder(in_channels=in_channels, hidden_dims=self.hidden_dim)
 
-        self.fc_mu_head = nn.Linear(self.hidden_dim[-1] * 4, self.latent_dim)
-        self.fc_sigma_head = nn.Linear(self.hidden_dim[-1] * 4, self.latent_dim)
+        self.fc_mu_head = nn.Linear(self.hidden_dim[-1] * (len(self.hidden_dim) - 1), self.latent_dim)
+        self.fc_sigma_head = nn.Linear(self.hidden_dim[-1] * (len(self.hidden_dim) - 1), self.latent_dim)
 
         self.pre_decoder_layer = nn.Linear(latent_dim, self.hidden_dim[-1]*4)
 
