@@ -115,7 +115,7 @@ class Trainer(BaseTrainer):
                 self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
                 self.logger.debug(
                     f"Train Epoch: {epoch} {self._progress(batch_idx)} \
-                        ASLoss: {batch['ASLoss'].item()}"
+                        VLBLoss: {batch['VLBLoss'].item()}"
                 )
                 if self.lr_scheduler is not None:
                     self.writer.add_scalar(
@@ -170,7 +170,7 @@ class Trainer(BaseTrainer):
             
 
             self.evaluation_metrics.update('EERMetric', self.metric(np.array(labels), np.array(preds)))
-            self.evaluation_metrics.update("ASLoss", batch["ASLoss"], n=32)
+            self.evaluation_metrics.update("VLBLoss", batch["VLBLoss"], n=32)
 
 
             self.writer.set_step(epoch * self.len_epoch, part)
