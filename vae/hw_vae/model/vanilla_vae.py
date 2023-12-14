@@ -35,7 +35,7 @@ class vVAE(nn.Module):
                                padding=1,
                                output_padding=1),
             nn.BatchNorm2d(self.hidden_dim[-1]),
-            nn.LeakyReLU(),
+            nn.ReLU(),
             nn.Conv2d(in_channels=self.hidden_dim[-1],
                       out_channels=3,
                       kernel_size=3,
