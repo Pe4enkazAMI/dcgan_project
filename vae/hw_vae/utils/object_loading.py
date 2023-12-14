@@ -1,6 +1,6 @@
 from operator import xor
 
-from hw_as.collate_fn.collate import collate_fn
+from hw_vae.collate_fn.collate import collate_fn
 from torch.utils.data import ConcatDataset, DataLoader
 from hydra.utils import instantiate
 from omegaconf import DictConfig

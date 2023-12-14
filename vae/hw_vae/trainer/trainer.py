@@ -139,9 +139,7 @@ class Trainer(BaseTrainer):
             val_log = self._evaluation_epoch(epoch, part, dataloader)
             log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
-        self._log_audio(batch['audio'][0],
-                         16000,
-                           f'Train_class={batch["targets"][0]}_predicted={batch["logits"].argmax(-1)[0]}.wav')
+        self.writer.add_image("Train_Image", batch["decoded_sample"][0, ...])
 
         return log
     

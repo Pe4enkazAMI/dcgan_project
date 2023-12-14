@@ -7,8 +7,8 @@ from functools import partial, reduce
 from operator import getitem
 from pathlib import Path
 
-from hw_as.logger import setup_logging
-from hw_as.utils import ROOT_PATH, read_json, write_json
+from hw_vae.logger import setup_logging
+from hw_vae.utils import ROOT_PATH, read_json, write_json
 
 
 class ConfigParser:
