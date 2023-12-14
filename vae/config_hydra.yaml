@@ -4,24 +4,9 @@ arch:
   _target_: hw_vae.model.vVAE
 
 train_ds:
-  _target_: hw_as.datasets_.ASVDataset
+  _target_: hw_as.datasets_.VAEDataset
   part: "train"
-  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
-  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"
-
-eval_ds:
-  _target_: hw_as.datasets_.ASVDataset
-  part: "eval"
-  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
-  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"
-
-  
-
-dev_ds:
-  _target_: hw_as.datasets_.ASVDataset
-  part: "dev"
-  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
-  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"      
+  data_path: "/kaggle/input/anime-faces"
 
 data:
   train:
@@ -29,21 +14,15 @@ data:
     num_workers: 6
     datasets: 
       - ${train_ds}
-  eval:
-    batch_size: 32
-    num_workers: 6
-    datasets:
-      - ${eval_ds}
-  dev:
-    batch_size: 32
-    num_workers: 6
-    datasets:
-      - ${dev_ds}
-          
+
 optimizer:
   _target_: torch.optim.Adam
-  lr: 0.0001
+  lr: 0.005
   weight_decay: 1e-4
+
+lr_scheduler:
+  _target_: torch.optim.lr_scheduler.ExponentialLR
+  gamma: 0.95
     
 Loss:
   _target_: hw_vae.loss.VLBLoss
