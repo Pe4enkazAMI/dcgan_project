@@ -68,7 +68,7 @@ class Trainer(BaseTrainer):
         """
         Move all necessary tensors to the GPU
         """
-        names = ["audio", "targets"]
+        names = ["image"]
         for tensor_for_gpu in names:
             batch[tensor_for_gpu] = batch[tensor_for_gpu].to(device)
         return batch
