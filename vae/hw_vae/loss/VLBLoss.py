@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 
 class VLBLoss(nn.Module):
-    def __init__(self, kld_weight=1) -> None:
+    def __init__(self, kld_weight=0.00025) -> None:
         super().__init__()
         self.kld_weight = kld_weight
 

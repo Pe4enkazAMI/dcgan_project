@@ -140,8 +140,10 @@ class Trainer(BaseTrainer):
             log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
         with torch.no_grad():
-            sample_image = self.model.generate(1, self.device)
-            self.writer.add_image("Train_Image", sample_image[0, ...])
+            self.model.eval()
+            sample_image = self.model.generate(2, self.device)
+            self.writer.add_image("Train_Image_1", sample_image[0, ...])
+            self.writer.add_image("Train_Image_2", sample_image[1, ...])
 
         return log
     
