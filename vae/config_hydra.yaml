@@ -1,0 +1,71 @@
+name: "RawNet2_train"
+n_gpu: 1
+preprocessing:
+  sr: 16000
+arch:
+  _target_: hw_as.model.RawNet2
+
+train_ds:
+  _target_: hw_as.datasets_.ASVDataset
+  part: "train"
+  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
+  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"
+
+eval_ds:
+  _target_: hw_as.datasets_.ASVDataset
+  part: "eval"
+  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
+  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"
+
+  
+
+dev_ds:
+  _target_: hw_as.datasets_.ASVDataset
+  part: "dev"
+  cm_protocls_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA_cm_protocols"
+  data_path: "/kaggle/input/asvpoof-2019-dataset/LA/LA/ASVspoof2019_LA"      
+
+data:
+  train:
+    batch_size: 32
+    num_workers: 6
+    datasets: 
+      - ${train_ds}
+  eval:
+    batch_size: 32
+    num_workers: 6
+    datasets:
+      - ${eval_ds}
+  dev:
+    batch_size: 32
+    num_workers: 6
+    datasets:
+      - ${dev_ds}
+          
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 0.0001
+  weight_decay: 1e-4
+    
+Loss:
+  _target_: hw_as.loss.ASLoss
+
+Metric:
+  _target_: hw_as.metrics.EERMetric
+
+
+trainer: 
+  epochs: 120
+  save_dir: "saved/"
+  save_period: 3
+  verbosity: 2
+  monitor: "off"
+  early_stop: 500
+  visualize: "wandb"
+  wandb_project: "AS_project"
+  run_name: "RawNet"
+  sample_rate: 16000
+  len_epoch: 1500
+  log_step: 50
+  grad_norm_clip: 10
+  finetune: false
