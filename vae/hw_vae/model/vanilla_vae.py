@@ -7,8 +7,8 @@ import numpy as np
 
 class vVAE(nn.Module):
     def __init__(self, 
-                 in_channels,
                  latent_dim, 
+                 in_channels=3,
                  hidden_dim=None, 
                  **kwargs) -> None:
         super().__init__()
