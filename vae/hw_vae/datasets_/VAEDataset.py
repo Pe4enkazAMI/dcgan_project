@@ -3,6 +3,7 @@ import os
 import torch.nn.functional as F
 import torchvision.transforms as T
 from PIL import Image
+import glob
 
 class VAEDataset(Dataset):
     def __init__(self, 
@@ -14,8 +15,7 @@ class VAEDataset(Dataset):
         self.limit = limit
         self.transforms = T.ToTensor()
 
-        self.images = os.listdir(self.image_path_folder)
-        self.images = list(map(lambda x: self.image_path_folder + "/" + x, self.images))
+        self.images = glob.glob(f"{self.image_path_folder}/*.png")
 
         if limit is not None:
             self.images = self.images[:limit]
