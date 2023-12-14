@@ -139,7 +139,9 @@ class Trainer(BaseTrainer):
             val_log = self._evaluation_epoch(epoch, part, dataloader)
             log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
-        self.writer.add_image("Train_Image", batch["decoded_sample"][0, ...])
+        with torch.no_grad():
+            sample_image = self.model.generate(1, self.device)
+            self.writer.add_image("Train_Image", sample_image[0, ...])
 
         return log
     
@@ -165,11 +167,11 @@ class Trainer(BaseTrainer):
                     metrics=self.evaluation_metrics,
                 )
 
-                preds = preds + batch["logits"].detach().cpu()[:, 1].tolist()
-                labels = labels + batch["targets"].detach().cpu().tolist()
+                # preds = preds + batch["logits"].detach().cpu()[:, 1].tolist()
+                # labels = labels + batch["targets"].detach().cpu().tolist()
             
 
-            self.evaluation_metrics.update('EERMetric', self.metric(np.array(labels), np.array(preds)))
+            # self.evaluation_metrics.update('EERMetric', self.metric(np.array(labels), np.array(preds)))
             self.evaluation_metrics.update("VLBLoss", batch["VLBLoss"], n=32)
 
 
