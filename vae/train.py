@@ -7,9 +7,9 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-from hw_as.trainer import Trainer
-from hw_as.utils import prepare_device
-from hw_as.utils.object_loading import get_dataloaders
+from hw_vae.trainer import Trainer
+from hw_vae.utils import prepare_device
+from hw_vae.utils.object_loading import get_dataloaders
 
 import hydra
 from hydra.utils import instantiate

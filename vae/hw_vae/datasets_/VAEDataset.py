@@ -1,6 +1,8 @@
 from torch.utils.data import Dataset
 import os
 import torch.nn.functional as F
+import torchvision.transforms as T
+from PIL import Image
 
 class VAEDataset(Dataset):
     def __init__(self, 
@@ -10,6 +12,7 @@ class VAEDataset(Dataset):
         self.part = part
         self.image_path_folder = data_path
         self.limit = limit
+        self.transforms = T.ToTensor()
 
         self.images = os.listdir(self.image_path_folder)
         self.images = list(map(lambda x: self.image_path_folder + "/" + x, self.images))
@@ -21,4 +24,6 @@ class VAEDataset(Dataset):
         return len(self.images)
     
     def __getitem__(self, index):
-        return {"image" : self.images[index]}
+        img = self.images[index]
+        img = Image.open(img).convert("RGB")
+        return {"image" : self.transforms(img)}

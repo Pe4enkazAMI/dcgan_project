@@ -1,9 +1,7 @@
-name: "RawNet2_train"
+name: "vVAE"
 n_gpu: 1
-preprocessing:
-  sr: 16000
 arch:
-  _target_: hw_as.model.RawNet2
+  _target_: hw_vae.model.vVAE
 
 train_ds:
   _target_: hw_as.datasets_.ASVDataset
@@ -48,10 +46,10 @@ optimizer:
   weight_decay: 1e-4
     
 Loss:
-  _target_: hw_as.loss.ASLoss
+  _target_: hw_vae.loss.VLBLoss
 
 Metric:
-  _target_: hw_as.metrics.EERMetric
+  _target_: hw_vae.metrics.SSIMMetric
 
 
 trainer: 
@@ -62,8 +60,8 @@ trainer:
   monitor: "off"
   early_stop: 500
   visualize: "wandb"
-  wandb_project: "AS_project"
-  run_name: "RawNet"
+  wandb_project: "VAE_project"
+  run_name: "VAE"
   sample_rate: 16000
   len_epoch: 1500
   log_step: 50

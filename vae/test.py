@@ -6,9 +6,9 @@ import sys
 import torch
 from tqdm import tqdm
 
-from hw_as.trainer import Trainer
-from hw_as.utils import prepare_device
-from hw_as.utils.object_loading import get_dataloaders
+from hw_vae.trainer import Trainer
+from hw_vae.utils import prepare_device
+from hw_vae.utils.object_loading import get_dataloaders
 import numpy as np
 import torchaudio
 import logging
