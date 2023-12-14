@@ -12,7 +12,7 @@ class VLBLoss(nn.Module):
 
     
     def forward(self, decoded_sample, input, mu, log_sigma, *args, **kwargs):
-        rec_loss = 0.5 * F.mse_loss(decoded_sample, input)
+        rec_loss = 0.5 * F.mse_loss(decoded_sample, input, reduction="sum")
         std = torch.sqrt(torch.exp(log_sigma))
 
         kld_loss = 0.5 * torch.sum(std.pow(2) + mu.pow(2) - 1. - torch.log(std.pow(2)))

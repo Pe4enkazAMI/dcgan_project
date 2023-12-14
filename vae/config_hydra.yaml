@@ -2,7 +2,8 @@ name: "vVAE"
 n_gpu: 1
 arch:
   _target_: hw_vae.model.vVAE
-  latent_dim: 128
+  latent_dim: 1024
+  hidden_dim: [32, 64, 128, 256, 512, 1024]
 
 train_ds:
   _target_: hw_vae.datasets_.VAEDataset
