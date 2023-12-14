@@ -6,7 +6,7 @@ arch:
 train_ds:
   _target_: hw_vae.datasets_.VAEDataset
   part: "train"
-  data_path: "/kaggle/input/anime-faces"
+  data_path: "/kaggle/input/anime-faces/data"
 
 data:
   train:
