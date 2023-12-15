@@ -192,7 +192,7 @@ class Trainer(BaseTrainer):
             loss = self.criterion(**batch)
             batch.update(loss)
             batch["VLBLoss"].backward()
-            self._clip_grad_norm()
+            #self._clip_grad_norm()
             metrics.update("grad_norm", self.get_grad_norm())
             self.optimizer.step()
 
