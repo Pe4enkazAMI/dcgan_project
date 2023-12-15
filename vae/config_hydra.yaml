@@ -46,5 +46,5 @@ trainer:
   sample_rate: 16000
   len_epoch: 1000
   log_step: 50
-  grad_norm_clip: 10
+  grad_norm_clip: 1000
   finetune: false
