@@ -2,7 +2,7 @@ name: "vVAE"
 n_gpu: 1
 arch:
   _target_: hw_vae.model.vVAE
-  latent_dim: 1024
+  latent_dim: 2048
   hidden_dim: [32, 64, 128, 256, 512]
 
 train_ds:
@@ -24,7 +24,7 @@ optimizer:
 
 lr_scheduler:
   _target_: torch.optim.lr_scheduler.ExponentialLR
-  gamma: 0.95
+  gamma: 0.99
     
 Loss:
   _target_: hw_vae.loss.VLBLoss
