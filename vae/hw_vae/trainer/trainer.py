@@ -222,8 +222,8 @@ class Trainer(BaseTrainer):
             
             self.g_optimizer.step()
 
-            metrics.update("Gloss", errG.item())
-            metrics.update("Dloss", errD.item())
+            metrics.update("GLoss", errG.item())
+            metrics.update("DLoss", errD.item())
             if (batch_idx % 500 == 0):
                 with torch.no_grad():
                     fake = self.model.generate(self.fixed_noise[:5, :, :, :]).detach().cpu().numpy()
