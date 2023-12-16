@@ -232,7 +232,7 @@ class Trainer(BaseTrainer):
                     image = np.array(self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
                     images.append(PIL.Image.fromarray(image, 'RGB'))
 
-                self.writer.add_images("example_images", images)
+                self.writer.add_image("example_images", images)
 
         return batch
     def normalize(self, arr, t_min, t_max):
