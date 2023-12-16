@@ -229,7 +229,7 @@ class Trainer(BaseTrainer):
                     fake = self.model.generate(self.fixed_noise[:5, :, :, :]).detach().cpu().numpy()
                 images = []
                 for image in fake:
-                    image = (self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
+                    image = np.array(self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
                     images.append(PIL.Image.fromarray(image, 'RGB'))
 
                 self.writer.add_images("example_images", images)
