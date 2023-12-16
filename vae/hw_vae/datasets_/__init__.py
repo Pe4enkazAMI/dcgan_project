@@ -1,5 +1,5 @@
-from hw_vae.datasets_.VAEDataset import VAEDataset
+from vae.hw_vae.datasets_.GANDataset import GANDataset
 
 __all__ = [
-    "VAEDataset",
+    "GANDataset",
 ]

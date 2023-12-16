@@ -1,5 +1,5 @@
-from .VLBLoss import VLBLoss
+from .GANLoss import GANLoss
 
 __all__ = [
-    "VLBLoss"
+    "GANLoss"
 ]

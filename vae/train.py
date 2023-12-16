@@ -53,14 +53,10 @@ def main(cfg: DictConfig):
     print("LOSS SETUP COMPLETED...")
     # build optimizer, learning rate scheduler. delete every line containing lr_scheduler for
     # disabling scheduler
-    params = model.parameters()
-    optimizer = instantiate(cfg["optimizer"], params=params)
-    
-    lrsched = cfg.get("lr_scheduler", None)
-    if lrsched is not None:
-        lr_scheduler = instantiate(cfg["lr_scheduler"], optimizer=optimizer)
-    else: 
-        lr_scheduler = None
+    params_g = model.generator.parameters()
+    g_optimizer = instantiate(cfg["g_optimizer"], params=params_g)
+    params_d = model.discriminator.parameters()
+    d_optimizer = instantiate(cfg["d_optimizer"], params=params_d)
     print("OPT AND LR SETUP COMPLETED...")
 
 
@@ -79,11 +75,12 @@ def main(cfg: DictConfig):
     trainer = Trainer(
         model=model,
         criterion=loss,
-        optimizer=optimizer,
+        g_optimizer=g_optimizer,
+        d_optimizer=d_optimizer,
         config=cfg,
         device=device,
         dataloaders=dataloaders,
-        lr_scheduler=lr_scheduler,
+        lr_scheduler=None,
         metric=metric,
         len_epoch=cfg["trainer"].get("len_epoch", None),
         ckpt_dir=_save_dir

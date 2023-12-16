@@ -5,6 +5,7 @@ from hw_vae.utils import MetricTracker, inf_loop
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 import numpy as np
+import PIL
 
 
 
@@ -18,7 +19,8 @@ class Trainer(BaseTrainer):
             self,
             model,
             criterion,
-            optimizer,
+            g_optimizer,
+            d_optimizer,
             config,
             device,
             dataloaders,
@@ -31,7 +33,8 @@ class Trainer(BaseTrainer):
         print(device)
         super().__init__(model=model, 
                          criterion=criterion,
-                         optimizer=optimizer,
+                         g_optimizer=g_optimizer,
+                         d_optimzier=d_optimizer,
                          lr_shceduler=lr_scheduler,
                          config=config,
                          device=device,
@@ -55,13 +58,14 @@ class Trainer(BaseTrainer):
         self.log_step = self.config["trainer"].get("log_step", 50)
         self.batch_accum_steps = self.config["trainer"].get("batch_accum_steps", 1)
 
-        self.loss_keys = ["VLBLoss"]
+        self.loss_keys = ["GANLoss"]
+        self.fixed_noise = torch.randn(64, self.model.generator.in_channels, 1, 1, device=device)
         
 
         self.train_metrics = MetricTracker(
-            "VLBLoss", "grad_norm", writer=self.writer
+            "GLoss","DLoss", "grad_norm", writer=self.writer
         )
-        self.evaluation_metrics = MetricTracker("VLBLoss", "SSIMMetric", writer=self.writer)
+        self.evaluation_metrics = MetricTracker("GANLoss", "SSIMMetric", writer=self.writer)
 
     @staticmethod
     def move_batch_to_device(batch, device: torch.device):
@@ -99,7 +103,8 @@ class Trainer(BaseTrainer):
                 batch = self.process_batch(
                         batch,
                         is_train=True,
-                        metrics=self.train_metrics
+                        metrics=self.train_metrics,
+                        batch_idx=batch_idx
                 )
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
@@ -133,7 +138,7 @@ class Trainer(BaseTrainer):
         log = last_train_metrics
 
         if self.lr_scheduler is not None:
-            self.lr_scheduler.step()
+            self.lr_scheduler.step(batch["VLBLoss"].item())
 
         for part, dataloader in self.evaluation_dataloaders.items():
             val_log = self._evaluation_epoch(epoch, part, dataloader)
@@ -182,29 +187,65 @@ class Trainer(BaseTrainer):
 
         return self.evaluation_metrics.result()
     
-    def process_batch(self, batch, is_train: bool, metrics: MetricTracker):
+    def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
         batch = self.move_batch_to_device(batch, self.device)
         logs = self.model(**batch)
 
         batch.update(logs)
         if is_train:
-            self.optimizer.zero_grad()
-            loss = self.criterion(**batch)
-            batch.update(loss)
-            batch["VLBLoss"].backward()
-            #self._clip_grad_norm()
-            metrics.update("grad_norm", self.get_grad_norm())
-            self.optimizer.step()
+            self.model.discriminator.zero_grad()
+            real_cpu = batch[0]
+            b_size = real_cpu
+            label = torch.full((b_size,), 1, dtype=torch.float, device=self.device)
+            output = self.model.discriminate(real_cpu).view(-1)
+            errD_real = self.criterion(output, label)
+            errD_real.backward()
 
-            for key in self.loss_keys:
-                metrics.update(key, batch[key].item())
-        else:
-            loss = self.criterion(**batch)
-            batch.update(loss)
-            for key in self.loss_keys:
-                metrics.update(key, batch[key].item())
+            D_x = output.mean().item()
+            noise = torch.randn(b_size, self.model.generator.nz, 1, 1, device=self.device)
+            fake = self.model.generate(noise)
+            label.fill_(0)
+            output = self.model.discriminate(fake.detach()).view(-1)
+            errD_fake = self.criterion(output, label)
+            errD_fake.backward()
+            D_G_z1 = output.mean().item()
+            errD = errD_real + errD_fake
+            self.d_optimizer.step()
+
+
+            self.model.generator.zero_grad()
+            label.fill_(1)  
+            
+            output = self.model.discriminate(fake).view(-1)
+            
+            errG = self.criterion(output, label)
+            
+            errG.backward()
+            D_G_z2 = output.mean().item()
+            
+            self.g_optimizer.step()
+
+            metrics.update("Gloss", errG.item())
+            metrics.update("Dloss", errD.item())
+            if (batch_idx % 500 == 0):
+                with torch.no_grad():
+                    fake = self.model.generate(self.fixed_noise[:5, :, :, :]).detach().cpu().numpy()
+                images = []
+                for image in fake:
+                    image = (self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
+                    images.append(PIL.Image.fromarray(image, 'RGB'))
+
+                self.writer.add_images("example_images", images)
+
         return batch
-
+    def normalize(self, arr, t_min, t_max):
+        norm_arr = []
+        diff = t_max - t_min
+        diff_arr = max(arr) - min(arr)    
+        for i in arr:
+            temp = (((i - min(arr)) * diff) / diff_arr) + t_min
+            norm_arr.append(temp)
+        return norm_arr
     def _progress(self, batch_idx):
         base = "[{}/{} ({:.0f}%)]"
         if hasattr(self.train_dataloader, "n_samples"):

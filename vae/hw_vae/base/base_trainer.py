@@ -13,7 +13,8 @@ class BaseTrainer:
     def __init__(self, 
                  model,
                  criterion, 
-                 optimizer, 
+                 g_optimizer, 
+                 d_optimizer,
                  lr_shceduler,
                  config, 
                  device,
@@ -24,7 +25,8 @@ class BaseTrainer:
         self.lr_scheduler = lr_shceduler
         self.model = model
         self.criterion = criterion
-        self.optimizer = optimizer
+        self.g_optimizer = g_optimizer
+        self.d_optimizer = d_optimizer
         self.ckpt_dir = ckpt_dir
 
 
@@ -160,7 +162,8 @@ class BaseTrainer:
                 "arch": arch,
                 "epoch": epoch,
                 "state_dict": self.model.state_dict(),
-                "optimizer": self.optimizer.state_dict(),
+                "g_optimizer": self.g_optimizer.state_dict(),
+                "d_optimizer": self.d_optimizer.state_dict(),
                 "monitor_best": self.mnt_best,
                 "config": self.config,
             }
@@ -210,15 +213,17 @@ class BaseTrainer:
         # load optimizer state from checkpoint only when optimizer type is not changed.
         if not self.config["finetune"]:
             if (
-                    checkpoint["config"]["optimizer"] != self.config["optimizer"] or
-                    checkpoint["config"]["lr_scheduler"] != self.config["lr_scheduler"]
+                    checkpoint["config"]["g_optimizer"] != self.config["g_optimizer"] or
+                    checkpoint["config"]["lr_scheduler"] != self.config["lr_scheduler"] or
+                    checkpoint["config"]["d_optimizer"] != self.config["d_optimizer"]
             ):
                 self.logger.warning(
                     "Warning: Optimizer or lr_scheduler given in config file is different "
                     "from that of checkpoint. Optimizer parameters not being resumed."
                 )
             else:
-                self.optimizer.load_state_dict(checkpoint["optimizer"])
+                self.g_optimizer.load_state_dict(checkpoint["g_optimizer"])
+                self.d_optimizer.load_state_dict(checkpoint["d_optimizer"])
                 self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
 
         self.logger.info(

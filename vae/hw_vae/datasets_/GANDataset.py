@@ -5,7 +5,7 @@ import torchvision.transforms as T
 from PIL import Image
 import glob
 
-class VAEDataset(Dataset):
+class GANDataset(Dataset):
     def __init__(self, 
                  part, 
                  data_path, 
@@ -13,7 +13,9 @@ class VAEDataset(Dataset):
         self.part = part
         self.image_path_folder = data_path
         self.limit = limit
-        self.transforms = T.ToTensor()
+        self.transforms = T.Compose([
+                               T.ToTensor(),
+                               T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
         self.images = glob.glob(f"{self.image_path_folder}/*.png")
 

@@ -17,17 +17,18 @@ data:
     datasets: 
       - ${train_ds}
 
-optimizer:
+g_optimizer:
   _target_: torch.optim.Adam
-  lr: 0.005
-  weight_decay: 0
+  lr: 0.0002
+  betas: [0.5, 0.999]
 
-lr_scheduler:
-  _target_: torch.optim.lr_scheduler.ExponentialLR
-  gamma: 0.99
-    
+d_optimizer:
+  _target_: torch.optim.Adam
+  lr: 0.0002
+  betas: [0.5, 0.999]
+ 
 Loss:
-  _target_: hw_vae.loss.VLBLoss
+  _target_: hw_vae.loss.GANLoss
 
 Metric:
   _target_: hw_vae.metrics.SSIMMetric

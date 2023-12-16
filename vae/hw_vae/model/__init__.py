@@ -1,6 +1,6 @@
-from .vanilla_vae import vVAE
+from .dc_gan import DCGAN
 
 
 __all__ = [
-    "vVAE"
+    "DCGAN"
 ]
