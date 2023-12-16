@@ -120,7 +120,7 @@ class Trainer(BaseTrainer):
                 self.writer.set_step((epoch - 1) * self.len_epoch + batch_idx)
                 self.logger.debug(
                     f"Train Epoch: {epoch} {self._progress(batch_idx)} \
-                        VLBLoss: {batch['VLBLoss'].item()}"
+                        GLoss: {batch['GLoss'].item()}, DLoss: {batch['DLoss']}"
                 )
                 if self.lr_scheduler is not None:
                     self.writer.add_scalar(
@@ -233,6 +233,8 @@ class Trainer(BaseTrainer):
                     images.append(PIL.Image.fromarray(image, 'RGB'))
                 for image in images:
                     self.writer.add_image("example_images", image)
+            batch["GLoss"] = errG
+            batch["DLoss"] = errD
 
         return batch
     def normalize(self, arr, t_min, t_max):
