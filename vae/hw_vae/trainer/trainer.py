@@ -144,12 +144,10 @@ class Trainer(BaseTrainer):
             val_log = self._evaluation_epoch(epoch, part, dataloader)
             log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
-        with torch.no_grad():
-            self.model.eval()
-            sample_image = self.model.generate(2, self.device)
-            self.writer.add_image("Train_Image_1", sample_image[0, ...])
-            self.writer.add_image("Train_Image_2", sample_image[1, ...])
 
+        with torch.no_grad():
+            fake = self.model.generate(self.fixed_noise[0, :, :, :]).detach().cpu().numpy()
+            self.writer.add_image("example_images", fake)
         return log
     
     def _evaluation_epoch(self, epoch, part, dataloader):
@@ -224,15 +222,6 @@ class Trainer(BaseTrainer):
 
             metrics.update("GLoss", errG.item())
             metrics.update("DLoss", errD.item())
-            if (batch_idx % 500 == 0):
-                with torch.no_grad():
-                    fake = self.model.generate(self.fixed_noise[:5, :, :, :]).detach().cpu().numpy()
-                images = []
-                for image in fake:
-                    image = np.array(self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
-                    images.append(PIL.Image.fromarray(image, 'RGB'))
-                for image in images:
-                    self.writer.add_image("example_images", image)
             batch["GLoss"] = errG
             batch["DLoss"] = errD
 
