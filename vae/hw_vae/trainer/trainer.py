@@ -59,7 +59,7 @@ class Trainer(BaseTrainer):
         self.batch_accum_steps = self.config["trainer"].get("batch_accum_steps", 1)
 
         self.loss_keys = ["GANLoss"]
-        self.fixed_noise = torch.randn(64, self.model.generator.in_channels, 1, 1, device=device)
+        self.fixed_noise = torch.randn(64, 100, 1, 1, device=device)
         
 
         self.train_metrics = MetricTracker(
