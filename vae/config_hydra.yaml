@@ -6,7 +6,7 @@ arch:
   hidden_dim: [32, 64, 128, 256, 512]
 
 train_ds:
-  _target_: hw_vae.datasets_.VAEDataset
+  _target_: hw_vae.datasets_.GANDataset
   part: "train"
   data_path: "/kaggle/input/anime-faces/data"
 
