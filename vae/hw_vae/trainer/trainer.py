@@ -238,9 +238,9 @@ class Trainer(BaseTrainer):
     def normalize(self, arr, t_min, t_max):
         norm_arr = []
         diff = t_max - t_min
-        diff_arr = max(arr) - min(arr)    
+        diff_arr = arr.max() - arr.min()
         for i in arr:
-            temp = (((i - min(arr)) * diff) / diff_arr) + t_min
+            temp = (((i - arr.min()) * diff) / diff_arr) + t_min
             norm_arr.append(temp)
         return norm_arr
     def _progress(self, batch_idx):
