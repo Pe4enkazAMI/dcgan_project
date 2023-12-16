@@ -231,8 +231,8 @@ class Trainer(BaseTrainer):
                 for image in fake:
                     image = np.array(self.normalize(image.reshape(image.shape[1], image.shape[2], image.shape[0]), 0, 1) * 255).astype('uint8')
                     images.append(PIL.Image.fromarray(image, 'RGB'))
-
-                self.writer.add_image("example_images", images)
+                for image in images:
+                    self.writer.add_image("example_images", image)
 
         return batch
     def normalize(self, arr, t_min, t_max):
