@@ -191,7 +191,7 @@ class Trainer(BaseTrainer):
         batch = self.move_batch_to_device(batch, self.device)
         if is_train:
             self.model.discriminator.zero_grad()
-            real_cpu = batch[0]
+            real_cpu = batch["images"][0]
             b_size = real_cpu
             label = torch.full((b_size,), 1, dtype=torch.float, device=self.device)
             output = self.model.discriminate(real_cpu).view(-1)
