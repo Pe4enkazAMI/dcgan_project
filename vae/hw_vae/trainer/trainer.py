@@ -34,7 +34,7 @@ class Trainer(BaseTrainer):
         super().__init__(model=model, 
                          criterion=criterion,
                          g_optimizer=g_optimizer,
-                         d_optimzier=d_optimizer,
+                         d_optimizer=d_optimizer,
                          lr_shceduler=lr_scheduler,
                          config=config,
                          device=device,
