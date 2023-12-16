@@ -192,7 +192,7 @@ class Trainer(BaseTrainer):
         if is_train:
             self.model.discriminator.zero_grad()
             real_cpu = batch["image"]
-            b_size = real_cpu.shape(0)
+            b_size = real_cpu.shape[0]
             label = torch.full((b_size,), 1, dtype=torch.float, device=self.device)
             output = self.model.discriminate(real_cpu).view(-1)
             errD_real = self.criterion(output, label)
