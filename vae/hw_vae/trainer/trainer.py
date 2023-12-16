@@ -148,8 +148,7 @@ class Trainer(BaseTrainer):
 
         with torch.no_grad():
             fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu().numpy()
-            print(fake.shape)
-            fake = T.ToPILImage()(fake[0, ...])
+            fake = T.ToPILImage()(fake[0, ...].reshape(64, 64, 3))
             self.writer.add_image("example_images", fake)
         return log
     
