@@ -6,6 +6,7 @@ from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 import numpy as np
 import PIL
+import torchvision.transforms as T
 
 
 
@@ -147,6 +148,7 @@ class Trainer(BaseTrainer):
 
         with torch.no_grad():
             fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu().numpy()
+            fake = T.ToPILImage()(fake)
             self.writer.add_image("example_images", fake)
         return log
     
