@@ -28,4 +28,4 @@ class GANDataset(Dataset):
     def __getitem__(self, index):
         img = self.images[index]
         img = Image.open(img).convert("RGB")
-        return {"image" : self.transforms(img)}
+        return self.transforms(img)
