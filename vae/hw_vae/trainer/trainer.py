@@ -189,9 +189,6 @@ class Trainer(BaseTrainer):
     
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
         batch = self.move_batch_to_device(batch, self.device)
-        logs = self.model(**batch)
-
-        batch.update(logs)
         if is_train:
             self.model.discriminator.zero_grad()
             real_cpu = batch[0]
