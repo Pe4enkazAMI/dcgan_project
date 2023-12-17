@@ -148,6 +148,7 @@ class Trainer(BaseTrainer):
 
 
         with torch.no_grad():
+            self.model.eval()
             fake = self.model.generate(self.fixed_noise).detach().cpu()
             self.writer.add_image("real_example_images", fake)
             self.writer.add_image("train_loop_example", batch["image_fake"])
