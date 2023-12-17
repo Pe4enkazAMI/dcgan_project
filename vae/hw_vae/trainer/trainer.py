@@ -149,7 +149,7 @@ class Trainer(BaseTrainer):
 
         with torch.no_grad():
             fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu()[0, ...]
-            fake = (fake + 1) * 127.5
+            fake = (torch.clip(fake, -1, 1) + 1) * 127.5
             self.writer.add_image("example_images", fake)
         return log
     
