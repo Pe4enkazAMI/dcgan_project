@@ -4,7 +4,7 @@ from.generator import Generator
 
 class DCGAN(nn.Module):
     def __init__(self, 
-                 in_channels=100,
+                 in_channels=128,
                  out_channels=64, 
                  pic_channels=3, 
                  disc_out_dim=64, *args, **kwargs) -> None:

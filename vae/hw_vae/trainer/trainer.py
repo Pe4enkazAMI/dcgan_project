@@ -61,7 +61,7 @@ class Trainer(BaseTrainer):
         self.batch_accum_steps = self.config["trainer"].get("batch_accum_steps", 1)
 
         self.loss_keys = ["GANLoss"]
-        self.fixed_noise = torch.randn(64, 100, 1, 1, device=device)
+        self.fixed_noise = torch.randn(64, 128, 1, 1, device=device)
         
 
         self.train_metrics = MetricTracker(
@@ -148,9 +148,9 @@ class Trainer(BaseTrainer):
 
 
         with torch.no_grad():
-            fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu()[0, ...]
-            fake = (torch.clip(fake, -1, 1) + 1) * 127.5
-            self.writer.add_image("example_images", fake)
+            fake = self.model.generate(self.fixed_noise).detach().cpu()
+            self.writer.add_image("real_example_images", fake)
+            self.writer.add_image("train_loop_example", batch["image_fake"])
         return log
     
     def _evaluation_epoch(self, epoch, part, dataloader):
@@ -175,8 +175,6 @@ class Trainer(BaseTrainer):
                     metrics=self.evaluation_metrics,
                 )
 
-                # preds = preds + batch["logits"].detach().cpu()[:, 1].tolist()
-                # labels = labels + batch["targets"].detach().cpu().tolist()
             
 
             # self.evaluation_metrics.update('EERMetric', self.metric(np.array(labels), np.array(preds)))
@@ -200,8 +198,9 @@ class Trainer(BaseTrainer):
             errD_real.backward()
 
             D_x = output.mean().item()
-            noise = torch.randn(b_size, self.model.generator.nz, 1, 1, device=self.device)
+            noise = torch.randn(b_size, 128, 1, 1, device=self.device)
             fake = self.model.generate(noise)
+            batch["image_fake"] = fake
             label.fill_(0)
             output = self.model.discriminate(fake.detach()).view(-1)
             errD_fake = self.criterion(output, label)
@@ -229,14 +228,7 @@ class Trainer(BaseTrainer):
             batch["DLoss"] = errD
 
         return batch
-    def normalize(self, arr, t_min, t_max):
-        norm_arr = []
-        diff = t_max - t_min
-        diff_arr = arr.max() - arr.min()
-        for i in arr:
-            temp = (((i - arr.min()) * diff) / diff_arr) + t_min
-            norm_arr.append(temp)
-        return norm_arr
+
     def _progress(self, batch_idx):
         base = "[{}/{} ({:.0f}%)]"
         if hasattr(self.train_dataloader, "n_samples"):
