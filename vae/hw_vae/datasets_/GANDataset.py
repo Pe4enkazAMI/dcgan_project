@@ -14,7 +14,8 @@ class GANDataset(Dataset):
         self.image_path_folder = data_path
         self.limit = limit
         self.transforms = T.Compose([
-                               T.ToTensor()])
+                               T.ToTensor(),
+                               T.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
         self.images = glob.glob(f"{self.image_path_folder}/*.png")
 

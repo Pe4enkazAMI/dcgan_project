@@ -7,6 +7,7 @@ from tqdm import tqdm
 import numpy as np
 import PIL
 import torchvision.transforms as T
+import matplotlib.pyplot as plt
 
 
 
@@ -147,9 +148,9 @@ class Trainer(BaseTrainer):
 
 
         with torch.no_grad():
-            fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu()
-            fake = torch.clamp(fake[0, ...], min=-1, max=1)
-            fake = T.ToPILImage(mode="RGB")(fake)
+            fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu()[0, ...]
+            plt.imsave("lolka.jpg", ((fake - fake.min()) / (fake.max() - fake.min()) * 255).reshape(64, 64, 3).detach().numpy().astype("uint8"))
+            fake = T.ToPILImage()(fake)
             self.writer.add_image("example_images", fake)
         return log
     
