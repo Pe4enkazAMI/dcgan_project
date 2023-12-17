@@ -21,9 +21,8 @@ g_optimizer:
   betas: [0.5, 0.999]
 
 d_optimizer:
-  _target_: torch.optim.Adam
-  lr: 0.0002
-  betas: [0.5, 0.999]
+  _target_: torch.optim.SGD
+  lr: 3e-4
  
 Loss:
   _target_: hw_vae.loss.GANLoss
