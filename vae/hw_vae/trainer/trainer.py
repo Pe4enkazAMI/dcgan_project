@@ -149,7 +149,7 @@ class Trainer(BaseTrainer):
 
         with torch.no_grad():
             fake = self.model.generate(self.fixed_noise[0, ...].unsqueeze(0)).detach().cpu()[0, ...]
-            plt.imsave("lolka.jpg", ((fake - fake.min()) / (fake.max() - fake.min()) * 255).reshape(64, 64, 3).detach().numpy().astype("uint8"))
+            plt.imsave("/kaggle/working/vae_project/vae/hw_vae/lolka.jpg", ((fake - fake.min()) / (fake.max() - fake.min()) * 255).reshape(64, 64, 3).detach().numpy().astype("uint8"))
             fake = T.ToPILImage()(fake)
             self.writer.add_image("example_images", fake)
         return log
