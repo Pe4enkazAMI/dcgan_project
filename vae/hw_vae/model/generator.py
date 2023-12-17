@@ -34,7 +34,7 @@ class Generator(nn.Module):
                                stride=2,
                                padding=1,
                                bias=False),
-            #nn.Tanh() # pixels should be in [-1, 1]
+            nn.Tanh() # pixels should be in [-1, 1]
         )
 
     def forward(self, input):
