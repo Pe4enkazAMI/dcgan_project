@@ -1,0 +1,8 @@
+name: "GANTest"
+n_gpu: 1
+preprocessing:
+  sr: 16000
+arch:
+  _target_: hw_vae.model.DCGAN
+    
+resume: "/Users/bayesian_monster/Downloads/YanGan60.pth"
