@@ -48,6 +48,7 @@ class Trainer(BaseTrainer):
         self.train_dataloader = dataloaders["train"]
         self.device = device
         self.metric = metric
+        self.denorm = T.Normalize(mean=[-1, -1, -1], std=[2, 2, 2])
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.train_dataloader)
@@ -197,8 +198,8 @@ class Trainer(BaseTrainer):
             metrics.update("DLoss", errD.item())
             batch["GLoss"] = errG
             batch["DLoss"] = errD
-            metrics.update("SSIM", self.ssim_metric(real_cpu, fake))
-            metrics.update("FID", self.fid_metric(real_cpu, fake))
+            metrics.update("SSIM", self.ssim_metric(self.denorm(real_cpu), self.denorm(fake)))
+            metrics.update("FID", self.fid_metric(self.denorm(real_cpu), self.denorm(fake)))
 
         return batch
 
