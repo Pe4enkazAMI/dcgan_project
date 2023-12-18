@@ -158,6 +158,8 @@ class Trainer(BaseTrainer):
             self.writer.add_image("train_loop_example", batch["image_fake"])
         self.train_metrics.update("FID", self.fid_metric(self.denorm(batch["image"][:16,...]).reshape(16, -1),
                                                          self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)))
+        self.train_metrics.update("SSIM", self.ssim_metric(self.denorm(batch["image"][:16, ...]),
+                                                           self.denorm(batch["image_fake"][:16, ...])))
         return log
     
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
@@ -200,7 +202,6 @@ class Trainer(BaseTrainer):
             metrics.update("DLoss", errD.item())
             batch["GLoss"] = errG
             batch["DLoss"] = errD
-            metrics.update("SSIM", self.ssim_metric(self.denorm(real_cpu), self.denorm(fake)))
 
         return batch
 
