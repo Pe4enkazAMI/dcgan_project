@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_channels, out_channels, num_layers=4):
+    def __init__(self, in_channels, out_channels, num_layers=3):
         super(Discriminator, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
