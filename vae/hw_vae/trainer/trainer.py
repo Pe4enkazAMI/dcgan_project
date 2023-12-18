@@ -154,11 +154,11 @@ class Trainer(BaseTrainer):
             self.writer.add_image("real_example_images", fake)
             self.writer.add_image("train_loop_example", batch["image_fake"])
         
-            fid = self.fid_metric(self.denorm(batch["image"][:16,...]).reshape(16, -1),
+            fid = self.metric[1](self.denorm(batch["image"][:16,...]).reshape(16, -1),
                                                          self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)).item()
             print("FID", fid)
             self.writer.add_scalar("FID", fid)
-            ssim = self.ssim_metric(self.denorm(batch["image"][:16, ...]),
+            ssim = self.metric[0](self.denorm(batch["image"][:16, ...]),
                                                            self.denorm(batch["image_fake"][:16, ...])).item()
             print("SSIM", ssim)
             self.writer.add_scalar("SSIM", ssim)
