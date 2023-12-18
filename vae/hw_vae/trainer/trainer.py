@@ -156,10 +156,12 @@ class Trainer(BaseTrainer):
             fake = self.model.generate(self.fixed_noise).detach().cpu()
             self.writer.add_image("real_example_images", fake)
             self.writer.add_image("train_loop_example", batch["image_fake"])
-        self.train_metrics.update("FID", self.fid_metric(self.denorm(batch["image"][:16,...]).reshape(16, -1),
-                                                         self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)))
-        self.train_metrics.update("SSIM", self.ssim_metric(self.denorm(batch["image"][:16, ...]),
-                                                           self.denorm(batch["image_fake"][:16, ...])))
+        
+            self.train_metrics.update("FID", self.fid_metric(self.denorm(batch["image"][:16,...]).reshape(16, -1),
+                                                         self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)).item())
+            
+            self.train_metrics.update("SSIM", self.ssim_metric(self.denorm(batch["image"][:16, ...]),
+                                                           self.denorm(batch["image_fake"][:16, ...])).item())
         return log
     
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
