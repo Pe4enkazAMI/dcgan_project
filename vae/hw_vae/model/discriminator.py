@@ -31,7 +31,7 @@ class Discriminator(nn.Module):
                           )
             )
             modules.append(
-                nn.BatchNorm2d(out_channels * exp_factor * 2)
+                nn.InstanceNorm2d(out_channels * exp_factor * 2)
             )
             modules.append(
                 nn.LeakyReLU(0.2, inplace=True)

@@ -176,9 +176,6 @@ class Trainer(BaseTrainer):
                     metrics=self.evaluation_metrics,
                 )
 
-            
-
-            # self.evaluation_metrics.update('EERMetric', self.metric(np.array(labels), np.array(preds)))
             self.evaluation_metrics.update("VLBLoss", batch["VLBLoss"], n=32)
 
 
