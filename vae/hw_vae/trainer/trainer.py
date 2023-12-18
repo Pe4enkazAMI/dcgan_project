@@ -164,7 +164,7 @@ class Trainer(BaseTrainer):
             ssim = self.ssim_metric(self.denorm(batch["image"][:16, ...]),
                                                            self.denorm(batch["image_fake"][:16, ...])).item()
             print("SSIM", ssim)
-            self.train_metrics.update("SSIM",ssim)
+            self.train_metrics.update("SSIM", ssim)
         return log
     
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
