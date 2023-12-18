@@ -65,9 +65,9 @@ class Trainer(BaseTrainer):
         self.loss_keys = ["GANLoss"]
         self.fixed_noise = torch.randn(64, 128, 1, 1, device=device)
         self.train_metrics = MetricTracker(
-            "GLoss", "DLoss", "SSIM", "FID", "grad_norm", writer=self.writer
+            "GLoss", "DLoss", "grad_norm", writer=self.writer
         )
-        self.evaluation_metrics = MetricTracker("GANLoss", "SSIMMetric", writer=self.writer)
+        self.evaluation_metrics = MetricTracker("GANLoss", "SSIMM", "FID", writer=self.writer)
 
     @staticmethod
     def move_batch_to_device(batch, device: torch.device):
@@ -140,13 +140,9 @@ class Trainer(BaseTrainer):
                 break
         log = last_train_metrics
 
-        if self.lr_scheduler is not None:
-            self.lr_scheduler.step(batch["VLBLoss"].item())
-
-        for part, dataloader in self.evaluation_dataloaders.items():
-            val_log = self._evaluation_epoch(epoch, part, dataloader)
-            log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
-
+        
+        val_log = self._evaluation_epoch(epoch, batch)
+        log.update(**{f"{'eval'}_{name}": value for name, value in val_log.items()})
 
         with torch.no_grad():
             self.model.eval()
@@ -154,16 +150,31 @@ class Trainer(BaseTrainer):
             self.writer.add_image("real_example_images", fake)
             self.writer.add_image("train_loop_example", batch["image_fake"])
         
-            fid = self.metric[1](self.denorm(batch["image"][:16,...]).reshape(16, -1),
-                                                         self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)).item()
-            print("FID", fid)
-            self.writer.add_scalar("FID", fid)
-            ssim = self.metric[0](self.denorm(batch["image"][:16, ...]),
-                                                           self.denorm(batch["image_fake"][:16, ...])).item()
-            print("SSIM", ssim)
-            self.writer.add_scalar("SSIM", ssim)
         return log
     
+    def _evaluation_epoch(self, epoch, batch):
+        """
+        Validate after training an epoch
+
+        :param epoch: Integer, current training epoch.
+        :return: A log that contains information about validation
+        """
+        self.model.eval()
+        self.evaluation_metrics.reset()
+        fid = self.metric[1](self.denorm(batch["image"][:16,...]).reshape(16, -1),
+                                                         self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)).item()
+        self.evaluation_metrics.update("FID", fid, n=1)
+        ssim = self.metric[0](self.denorm(batch["image"][:16, ...]),
+                                                           self.denorm(batch["image_fake"][:16, ...])).item()
+        self.evaluation_metrics.update("SSIM", ssim, n=1)
+
+
+        self.writer.set_step(epoch * self.len_epoch, "eval")
+        self._log_scalars(self.evaluation_metrics)
+
+        return self.evaluation_metrics.result()
+
+
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
         batch = self.move_batch_to_device(batch, self.device)
         if is_train:

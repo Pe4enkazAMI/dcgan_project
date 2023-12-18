@@ -47,16 +47,9 @@ def main(cfg):
     print(device)
     model = model.to(device)
     model.eval()
-    path_to_data = dp(cfg.test_data_path)
-
-    for path in path_to_data:
-        audio = torchaudio.load(path)[0].reshape(-1)
-        audio = audio.unsqueeze(0)
-        logits = model(audio)
-        probs = torch.softmax(logits["logits"], dim=-1)
-        probs_spoof = probs[:, 0]
-        probs_real = probs[:, 1]
-        print(f"Audio: {path.split('/')[-1]}, Spoof: {probs_spoof.item()}, Bonafine: {probs_real.item()}")
+    noise = torch.randn(128, 128, 1, 1)
+    fakes = model.generate(noise)
+    fakes = (fakes + 1) * 127.5
 
 
 if __name__ == "__main__":
