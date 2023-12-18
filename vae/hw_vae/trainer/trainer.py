@@ -199,7 +199,7 @@ class Trainer(BaseTrainer):
             batch["GLoss"] = errG
             batch["DLoss"] = errD
             metrics.update("SSIM", self.ssim_metric(self.denorm(real_cpu), self.denorm(fake)))
-            metrics.update("FID", self.fid_metric(self.denorm(real_cpu), self.denorm(fake)))
+            metrics.update("FID", self.fid_metric(self.denorm(real_cpu).reshape(b_size, -1), self.denorm(fake).reshape(b_size, -1)))
 
         return batch
 
