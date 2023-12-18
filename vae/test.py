@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 import torch
 from tqdm import tqdm
-
+from torchvision.utils import save_image
 from hw_vae.trainer import Trainer
 from hw_vae.utils import prepare_device
 from hw_vae.utils.object_loading import get_dataloaders
@@ -49,7 +49,9 @@ def main(cfg):
     model.eval()
     noise = torch.randn(128, 128, 1, 1)
     fakes = model.generate(noise)
-    fakes = (fakes + 1) * 127.5
+    
+    save_image(fakes, "grid.png")
+
 
 
 if __name__ == "__main__":

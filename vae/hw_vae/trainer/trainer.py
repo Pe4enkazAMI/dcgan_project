@@ -67,7 +67,7 @@ class Trainer(BaseTrainer):
         self.train_metrics = MetricTracker(
             "GLoss", "DLoss", "grad_norm", writer=self.writer
         )
-        self.evaluation_metrics = MetricTracker("GANLoss", "SSIMM", "FID", writer=self.writer)
+        self.evaluation_metrics = MetricTracker("GANLoss", "SSIM", "FID", writer=self.writer)
 
     @staticmethod
     def move_batch_to_device(batch, device: torch.device):
