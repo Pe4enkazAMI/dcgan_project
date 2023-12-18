@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_channels, out_channels, num_layers=3):
+    def __init__(self, in_channels, out_channels, num_layers=4):
         super(Discriminator, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -31,7 +31,7 @@ class Discriminator(nn.Module):
                           )
             )
             modules.append(
-                nn.InstanceNorm2d(out_channels * exp_factor * 2)
+                nn.BatchNorm2d(out_channels * exp_factor * 2)
             )
             modules.append(
                 nn.LeakyReLU(0.2, inplace=True)

@@ -8,7 +8,8 @@ import numpy as np
 import PIL
 import torchvision.transforms as T
 import matplotlib.pyplot as plt
-
+from hw_vae.metrics import SSIMMetric
+from hw_vae.metrics import FIDMetric
 
 
 
@@ -63,9 +64,10 @@ class Trainer(BaseTrainer):
         self.loss_keys = ["GANLoss"]
         self.fixed_noise = torch.randn(64, 128, 1, 1, device=device)
         
-
+        self.ssim_metric = SSIMMetric()
+        self.fid_metric = FIDMetric()
         self.train_metrics = MetricTracker(
-            "GLoss","DLoss", "grad_norm", writer=self.writer
+            "GLoss","DLoss", "SSIM", "FID", "grad_norm", writer=self.writer
         )
         self.evaluation_metrics = MetricTracker("GANLoss", "SSIMMetric", writer=self.writer)
 
@@ -97,7 +99,7 @@ class Trainer(BaseTrainer):
         self.writer.add_scalar("epoch", epoch)
 
         progress_bar = tqdm(range(self.len_epoch), desc='train')
-
+        preds = {"image": []}
         for batch_idx, batch in enumerate(self.train_dataloader):
             stop = False
             progress_bar.update(1)
@@ -108,6 +110,7 @@ class Trainer(BaseTrainer):
                         metrics=self.train_metrics,
                         batch_idx=batch_idx
                 )
+
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
                     self.logger.warning("OOM on batch. Skipping batch.")
@@ -154,36 +157,6 @@ class Trainer(BaseTrainer):
             self.writer.add_image("train_loop_example", batch["image_fake"])
         return log
     
-    def _evaluation_epoch(self, epoch, part, dataloader):
-        """
-        Validate after training an epoch
-
-        :param epoch: Integer, current training epoch.
-        :return: A log that contains information about validation
-        """
-        self.model.eval()
-        self.evaluation_metrics.reset()
-        preds, labels = [], []
-        with torch.no_grad():
-            for batch_idx, batch in tqdm(
-                    enumerate(dataloader),
-                    desc=part,
-                    total=len(dataloader),
-            ):
-                batch = self.process_batch(
-                    batch,
-                    is_train=False,
-                    metrics=self.evaluation_metrics,
-                )
-
-            self.evaluation_metrics.update("VLBLoss", batch["VLBLoss"], n=32)
-
-
-            self.writer.set_step(epoch * self.len_epoch, part)
-            self._log_scalars(self.evaluation_metrics)
-
-        return self.evaluation_metrics.result()
-    
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):
         batch = self.move_batch_to_device(batch, self.device)
         if is_train:
@@ -224,6 +197,8 @@ class Trainer(BaseTrainer):
             metrics.update("DLoss", errD.item())
             batch["GLoss"] = errG
             batch["DLoss"] = errD
+            metrics.update("SSIM", self.ssim_metric(batch["image"], batch["image_fake"]))
+            metrics.update("FID", self.fid_metric(batch["image"], batch["image_fake"]))
 
         return batch
 

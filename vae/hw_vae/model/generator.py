@@ -20,7 +20,7 @@ class Generator(nn.Module):
                 bias=False
             ))
             modules.append(
-                nn.InstanceNorm2d(out_channels * exp_factor)
+                nn.BatchNorm2d(out_channels * exp_factor)
             )
             modules.append(nn.LeakyReLU(0.2, inplace=True))
             in_channels = exp_factor * out_channels
