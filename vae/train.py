@@ -48,7 +48,8 @@ def main(cfg: DictConfig):
         model = torch.nn.DataParallel(model, device_ids=device_ids)
 
     # get function handles of loss and metrics
-    metric = instantiate(cfg["Metric"])
+    metric_ssim = instantiate(cfg["Metric"])
+    metric_fid = instantiate(cfg["Metric_2"])
     loss = instantiate(cfg["Loss"]).to(device)
     print("LOSS SETUP COMPLETED...")
     # build optimizer, learning rate scheduler. delete every line containing lr_scheduler for
@@ -81,7 +82,7 @@ def main(cfg: DictConfig):
         device=device,
         dataloaders=dataloaders,
         lr_scheduler=None,
-        metric=metric,
+        metric=[metric_ssim, metric_fid],
         len_epoch=cfg["trainer"].get("len_epoch", None),
         ckpt_dir=_save_dir
     )

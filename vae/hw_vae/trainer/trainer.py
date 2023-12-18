@@ -64,11 +64,8 @@ class Trainer(BaseTrainer):
 
         self.loss_keys = ["GANLoss"]
         self.fixed_noise = torch.randn(64, 128, 1, 1, device=device)
-        
-        self.ssim_metric = SSIMMetric()
-        self.fid_metric = FIDMetric()
         self.train_metrics = MetricTracker(
-            "GLoss","DLoss", "SSIM", "FID", "grad_norm", writer=self.writer
+            "GLoss", "DLoss", "SSIM", "FID", "grad_norm", writer=self.writer
         )
         self.evaluation_metrics = MetricTracker("GANLoss", "SSIMMetric", writer=self.writer)
 
@@ -160,11 +157,11 @@ class Trainer(BaseTrainer):
             fid = self.fid_metric(self.denorm(batch["image"][:16,...]).reshape(16, -1),
                                                          self.denorm(batch["image_fake"][:16, ...]).reshape(16, -1)).item()
             print("FID", fid)
-            self.train_metrics.update("FID", fid)
+            self.writer.add_scalar("FID", fid)
             ssim = self.ssim_metric(self.denorm(batch["image"][:16, ...]),
                                                            self.denorm(batch["image_fake"][:16, ...])).item()
             print("SSIM", ssim)
-            self.train_metrics.update("SSIM", ssim)
+            self.writer.add_scalar("SSIM", ssim)
         return log
     
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker, batch_idx):

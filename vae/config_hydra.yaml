@@ -31,6 +31,9 @@ Loss:
 Metric:
   _target_: hw_vae.metrics.SSIMMetric
 
+Metric_2:
+  _target_: hw_vae.metrics.FIDMetric
+
 
 trainer: 
   epochs: 120
